@@ -9,8 +9,22 @@ func routes(_ app: Application) throws {
         "Hello, world!"
     }
     
-    app.get("tweet", ":content") { req in
-        guard let content = req.parameters.get("content") else { throw Abort(.internalServerError) }
-        return "\(content)"
+    app.get("tweet", ":status") { req in
+        guard let status = req.parameters.get("status") else { throw Abort(.internalServerError) }
+        Task {
+            let bot = TwitterBot()
+            bot.createTweet(status)
+        }
+        return "bot tweeted \(status)"
+    }
+    
+    app.post("tweet") { req in
+        
+        Task {
+            guard let status = try? req.content.decode(TwitterBot.Tweet.self).status else { throw Abort(.internalServerError) }
+            let bot = TwitterBot()
+            bot.createTweet(status)
+        }
+        return Response(status: .accepted, version: .http3, body: Response.Body(stringLiteral: "Accepted"))
     }
 }
