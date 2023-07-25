@@ -25,7 +25,6 @@ extension String {
 }
 
 extension TwitterBot {
-    
     struct Signature {
         static func parameterString(_ params: [(String, String)]) -> String {
             let sortedParams = params.sorted{ $0.0 < $1.0 }
